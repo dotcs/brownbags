@@ -35,16 +35,17 @@
 
             <small>by Fabian Mueller (
               <svg height="26" width="26" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg>
-              : <a href="https://github.com/dotcs">dotcs</a>)</small>
+              : <a href="https://github.com/dotcs">dotcs</a>), last update: October 2016</small>
           </script>
         </section>
 
         <section data-markdown data-noescape>
           <script type="text/template">
             ## RxJS <!-- .element: style="text-transform: none;" -->
-            * Developed by Microsoft
+            * Developed by Microsoft (first presented in [2010 @JSConf](https://www.youtube.com/watch?v=1XaFMOyBxno))
             * License: Apache v2
             * Current version: [4.0](https://github.com/Reactive-Extensions/RxJS), next version [5.0 (currently in beta)](https://github.com/ReactiveX/rxjs)
+            * v4 ~12000 stars, v5 ~3300 stars
             * Gained a lot of popularity through Google's decision to use it in Angular 2
             * Is framework-agnostic and has no dependencies
             * Follows the functional reactive programming approach
@@ -259,11 +260,11 @@ setTimeout(() => {
 
           <section>
             <h3>Shared Observables</h3>
-            <p>
-              Observables are not shared accross subscribers by default.
-              Each subscriber usually gets its own instance.
-              Thus shared Observables are always hot.
-            </p>
+            <ul>
+              <li>Observables are not shared accross subscribers by default</li>
+              <li>Each subscriber usually gets its own instance</li>
+              <li>Shared Observables are always hot</li>
+            </ul>
             <pre><code data-trim class="javascript">
 const stream$ = Rx.Observable
   .interval(500)
@@ -285,11 +286,10 @@ setTimeout(() => {
 
         <section>
           <h3>Combining Observables</h3>
-          <p>
-            Demo of how to deal with async data.
-            Change <code>mergeMap</code> to <code>switchMap</code> to get
-            rid of any overlaps of the async responses.
-          </p>
+          <ul>
+            <li>Demo of how to deal with async data.</li>
+            <li>Change <code>mergeMap</code> to <code>switchMap</code> to get rid of any overlaps of the async responses.</li>
+          </ul>
           <pre><code data-trim class="javascript">
 const dataset = [
   {id: 1, timeout: 2000},
@@ -353,14 +353,17 @@ result$.subscribe(
 
           <section>
             <h3>Error and retry</h3>
-            <p>
-              Error handling can also be added to the pipeline. Operators such as
-              <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-retry"><code>retry</code></a>,
-              <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-retryWhen"><code>retryWhen</code></a>
-              and
-              <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-catch"><code>catch</code></a>
-              are available.
-            </p>
+            <ul>
+              <li>Error handling can also be added to the pipeline</li>
+              <li>
+                Operators such as
+                <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-retry"><code>retry</code></a>,
+                <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-retryWhen"><code>retryWhen</code></a>
+                and
+                <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-catch"><code>catch</code></a>
+                are available
+              </li>
+            </ul>
             <pre><code data-trim class="javascript">
 const interval$ = Rx.Observable.interval(100);
 const result$ = interval$
@@ -391,13 +394,23 @@ result$.subscribe(x => console.log(x));
         </section>
 
         <section data-markdown>
+          <script type="text/template">
+            ### Outlook
+
+            - Observables might become standardized by TC39: [Proposal Observable](https://github.com/tc39/proposal-observable), currently stage 1
+            - RxJS 5 is in beta since December 2015, currently beta 12
+            - [Migration path from RxJS 4 to 5](https://github.com/ReactiveX/rxjs/blob/master/MIGRATION.md) (WIP)
+
+          </script>
+        </section>
+
+        <section data-markdown>
           ### Code samples
 
           - [Redux: A minimalistic RxJS implementation](https://jsbin.com/furelam/edit?js,console)
           - [Angular 2: Isolate components with RxJS](http://plnkr.co/edit/zL67mT7mbJ6kbjsAPtCJ?p=preview)
           - Drag and drop implementation: [Easy](https://jsfiddle.net/djwfyxs5/), [Advanced](https://jsfiddle.net/bq8s4dbt/)
           - Error handling: [Automatic retry with `retryWhen`](https://jsbin.com/behofo/edit?js,console)
-
         </section>
 
         <section>
@@ -407,9 +420,12 @@ result$.subscribe(x => console.log(x));
             - [RxJS API Doc](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html) and [Manual](http://reactivex.io/rxjs/manual/index.html)
             - [The introduction to Reactive Programming you've been missing](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754) (RxJS 4)
             - [RxJS Doc: Error handling](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/errors.md)
+            - [rx-book](http://xgrommx.github.io/rx-book/) (RxJS 4)
             - [Introduction to Reactive Programming](https://egghead.io/courses/introduction-to-reactive-programming) (egghead.io)
             - [Creating Observables from scratch](https://egghead.io/courses/rxjs-beyond-the-basics-creating-observables-from-scratch) (egghead.io)
             - [Operators in Depth](https://egghead.io/courses/rxjs-beyond-the-basics-creating-observables-from-scratch) (egghead.io)
+            - [RxJS with Matthew Podwysocki](https://devchat.tv/js-jabber/182-jsj-rxjs-with-matthew-podwysocki) (JSJ Podcast)
+            - [Podcastwysocki - RxJS Banter with Matt Podwysocki and Ben Lesh](http://modernweb.podbean.com/e/podcastwysocki-rxjs-banter-with-matt-podwysocki-and-ben-lesh/) (Modern Web Podcast)
           </section>
 
           <section data-markdown>
@@ -417,8 +433,9 @@ result$.subscribe(x => console.log(x));
 
             - [Build Redux Style Applications with Angular2, RxJS and ngrx/store](https://egghead.io/courses/building-a-time-machine-with-angular-2-and-rxjs) (egghead.io)
             - [Learn the Basics of Angular 2 Forms](https://egghead.io/courses/intro-to-angular-2-forms) (egghead.io)
-
+            - [Functional Reactive Programming for Angular 2 Developers - RxJs and Observables](http://blog.angular-university.io/functional-reactive-programming-for-angular-2-developers-rxjs-and-observables/)
           </section>
+
         </section>
 
       </div>
