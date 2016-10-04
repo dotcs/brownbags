@@ -1,0 +1,444 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>reveal.js</title>
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/beige.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+
+        <section data-markdown>
+          <script type="text/template">
+            # RxJS <!-- .element: style="border: none; box-shadow: none; text-transform: none; " -->
+
+            ![RxJS logo](http://reactivex.io/assets/Rx_Logo_M.png) <!-- .element: style="border: none; box-shadow: none; height: 300px" -->
+
+            ### Reactive extensions for Javascript
+
+            <small>by Fabian Mueller (
+              <svg height="26" width="26" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg>
+              : <a href="https://github.com/dotcs">dotcs</a>)</small>
+          </script>
+        </section>
+
+        <section data-markdown data-noescape>
+          <script type="text/template">
+            ## RxJS <!-- .element: style="text-transform: none;" -->
+            * Developed by Microsoft
+            * License: Apache v2
+            * Current version: [4.0](https://github.com/Reactive-Extensions/RxJS), next version [5.0 (currently in beta)](https://github.com/ReactiveX/rxjs)
+            * Gained a lot of popularity through Google's decision to use it in Angular 2
+            * Is framework-agnostic and has no dependencies
+            * Follows the functional reactive programming approach
+            * <mark>Demos in this presentation will use RxJS 5</mark>
+          </script>
+        </section>
+
+        <section>
+          <h3>Functional programming</h3>
+          <p>
+            Pipe data through (pure) functions to manipulate datasets without
+            changing the underlying data (immutable data).
+          </p>
+          <pre><code data-trim class="javascript">
+// POJS
+const data = [[1,2], [1,2,3], [1]];
+const result = data
+  .map(x => x.length)
+  .filter(x => x > 1)
+  .reduce((acc, len) => acc + len, 0);
+console.log(result); // will return 5
+          </code></pre>
+          <small><a href="https://jsbin.com/fakobez/edit?js,console">jsbin</a></small>
+          <pre><code data-trim class="javascript">
+// RxJS
+const data = [[1,2], [1,2,3], [1]];
+Rx.Observable.from(data)
+  .map(x => x.length)
+  .filter(x => x > 1)
+  .reduce((acc, len) => acc + len, 0)
+  .subscribe(x => console.log(x)); // will return 5
+          </code></pre>
+          <small><a href="https://jsbin.com/dakufon/edit?js,console">jsbin</a></small>
+        </section>
+
+        <section>
+          <section data-markdown>
+            ### Reactive programming
+
+            > [Reactive programming] means that it should be possible to express static or dynamic data flows with ease in the programming languages used, and that the underlying execution model will automatically propagate changes through the data flow.
+            >
+            > [Wikipedia (Reactive programming)](https://en.wikipedia.org/wiki/Reactive_programming)
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+            ### Reactive programming
+
+            |      | Single   | Multiple   |
+            |------|----------|------------|
+            | Pull | Function | Generator  |
+            | Push | Promise  | Observable <!-- .element: class="fragment" data-fragment-index="2" --> |
+            </script>
+          </section>
+
+          <section>
+            <h3>Reactive programming</h3>
+            <pre><code data-trim class="javascript">
+// Describe data pipeline
+const stream$ = new Rx.Subject()
+  .map(x => x.length)
+  .filter(x => x > 1)
+  .scan((acc, length) => acc + length, 0);
+
+// Subscription adds side effects
+stream$.subscribe(x => console.log(x));
+
+// Feed new data into the data stream
+stream$.next([1,2]);
+stream$.next([1,2,3]);
+stream$.next([1]);
+            </code></pre>
+            <small><a href="https://jsbin.com/lacojo/edit?js,console">jsbin</a></small>
+          </section>
+        </section>
+
+        <section>
+          <h3>Observables</h3>
+          <ul>
+            <li>Cold by default (do nothing until subscribed to)</li>
+            <li class="fragment">Can be unsubscribed from (in contrast to Promises)</li>
+            <li class="fragment">Data transformations don't change the original streams but create new streams</li>
+            <li class="fragment">Are cheap to produce</li>
+            <li class="fragment">Can be combined through operators with other observables</li>
+            <li class="fragment">Many producers are available: <code>from</code>, <code>of</code>, <code>interval</code>, <code>fromPromise</code>, etc.</li>
+            <li class="fragment">Many operators are available: <code>map</code>, <code>filter</code>, <code>merge</code>, <code>flatMap</code>, etc.</li>
+            <li class="fragment">Custom Observables and Operators can be written if required</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3><mark>Caution</mark>: Values of Observables are not immutable by default!</h3>
+          <pre><code data-trim class="javascript">
+const stream$ = Rx.Observable.of({ test: true });
+const stream2$ = stream$
+  .map(x => {
+    x.myProp = false;
+    return x;
+  });
+
+stream$.subscribe(x => console.log(x));
+stream2$.subscribe(x => console.log(x)); // Here the underlying data
+                                         // is changed
+stream$.subscribe(x => console.log(x));  // Because the underlying
+                                         // object is mutable, this
+                                         // subsciption is now also
+                                         // affected
+          </code></pre>
+          <small><a href="https://jsbin.com/fagegi/edit?js,console">jsbin</a>, <a href="https://jsbin.com/baqixey/edit?js,console">other example</a></small>
+          <p>
+            Solutions: Take care ... or use <a href="https://facebook.github.io/immutable-js/docs/#/">immutable.js</a>
+          </p>
+        </section>
+
+        <section data-markdown>
+          <script type="text/template" data-noescape>
+            ### Subscription
+
+            Observable's life span:
+            <mark>(next)* (complete|error)</mark>
+
+            - Run forever
+            - Complete
+            - Throw an error
+
+            <div class="fragment">
+              <p>Thus subscriptions provide three callback methods</p>
+              <pre><code data-trim class="javascript">
+const stream$ = Rx.Observable.from( ... );
+stream$.subscribe(
+  (next)  => { /* called on next value */ },
+  (error) => { /* called in case of an (unhandled) error */  },
+  ()      => { /* called when the observable completes */ }
+);
+              </code></pre>
+            </div>
+          </script>
+        </section>
+
+        <section data-markdown>
+          <script type="text/template">
+            ### Marble diagrams
+
+            Marble diagrams can be used to get a visual understanding of the data and operations.
+
+            <pre><code data-trim class="nohighlight">
+stream$:            ---o---o-------o--o---------|
+streamNeverending$: ---o---o-------o--o----------
+streamWithError$:   ---o---o-------o--o---------X
+
+Legend:
+o : Value
+| : Complete signal
+X : Error signal
+            </code></pre>
+
+            <div class="fragment">
+              <hr>
+
+              <pre><code data-trim class="nohighlight">
+stream$:            ---o---o-------o--o---------------|
+
+                    vvvvvv  map (x => 1)  vvvvvvvvvvvvv
+
+                    ---1---1-------1--1---------------|
+
+                    v  scan ((acc, x) => acc + x, 0)  v
+
+                    ---1---2-------3--4---------------|
+              </code></pre>
+            </div>
+
+          </script>
+        </section>
+
+        <section data-markdown>
+          <script type="text/template">
+            ### Marble diagrams
+
+            Rich man's marble diagrams even have some pretty colors :)
+
+            ![switchMap operator](http://reactivex.io/rxjs/img/switchMap.png) <!-- .element: style="max-height: 450px" -->
+          </script>
+        </section>
+
+        <section>
+          <section data-markdown>
+            <script type="text/template">
+              ### Hot vs. cold
+
+              * Observables are lazy (cold) by default and do nothing until someone subscribes to them.<br>
+              * Hot Observables emit (same) values for any Observers - even if there are none.
+
+              <pre><code data-trim class="javascript">
+const stream$ = Rx.Observable
+  .interval(500)
+  .take(10);
+
+const hotStream$ = stream$.publish(); // create a hot observable
+hotStream$.connect();  // start emitting - regardless of number
+                       // of observers
+
+setTimeout(() => {
+  stream$.subscribe(x => console.log(`stream$: ${x}`));
+  hotStream$.subscribe(x => console.log(`hotStream$: ${x}`));
+}, 2000);
+              </code></pre>
+
+            </script>
+          </section>
+
+          <section>
+            <h3>Shared Observables</h3>
+            <p>
+              Observables are not shared accross subscribers by default.
+              Each subscriber usually gets its own instance.
+              Thus shared Observables are always hot.
+            </p>
+            <pre><code data-trim class="javascript">
+const stream$ = Rx.Observable
+  .interval(500)
+  .take(10)
+  .share(); // Share data across subscribers (at least one
+            // subscriber is necessary).
+            // This is the same as publish().refCount() and
+            // automatically makes the observable hot.
+
+stream$.subscribe(x => console.log(`stream$ (1): ${x}`));
+
+setTimeout(() => {
+  stream$.subscribe(x => console.log(`stream$ (2): ${x}`));
+}, 2000);
+            </code></pre>
+            <small><a href="https://jsbin.com/ziwigi/edit?js,console">jsbin</a></small>
+          </section>
+        </section>
+
+        <section>
+          <h3>Combining Observables</h3>
+          <p>
+            Demo of how to deal with async data.
+            Change <code>mergeMap</code> to <code>switchMap</code> to get
+            rid of any overlaps of the async responses.
+          </p>
+          <pre><code data-trim class="javascript">
+const dataset = [
+  {id: 1, timeout: 2000},
+  {id: 2, timeout: 600},
+  {id: 3, timeout: 600}
+];
+
+// 0----1----2----3----4- Seconds
+
+// x----x----x|
+// 1----2----3|        this could be a request
+// --------2-1--3|     this could be a response from the server
+
+
+const interval = 200; // time in ms
+const interval$ = Rx.Observable.interval(interval)
+  .map(i => i+1)
+  .startWith(0)
+  .map(i => `Elapsed time: ${i * interval}`);
+
+const demo$ = Rx.Observable.interval(1000)
+  .map(i => i+1)
+  .startWith(0)
+  .take(dataset.length)
+  .map(i => dataset[i])
+  .mergeMap(x => Rx.Observable.timer(x.timeout).mapTo(x));
+  // use switchMap in the next line to automatically
+  // unsubscribe from observable branches that are not
+  // the newest (in RxJS 4: flatMapLatest)
+
+interval$.merge(demo$)
+  .takeUntil(Rx.Observable.timer(3000))
+  .subscribe(x => console.log(x));
+          </code></pre>
+          <small><a href="https://jsbin.com/vayanoc/edit?js,console">jsbin</a></small>
+        </section>
+
+        <section>
+          <section>
+            <h3>Error handling</h3>
+            <p>
+              Errors can be handled in the error callback.
+            </p>
+
+            <pre><code data-trim class="javascript">
+const interval$ = Rx.Observable.interval(1000);
+const result$ = interval$
+  .mergeMap(x =>
+    x === 3 ?
+      Rx.Observable.throw(`I don't like threes`) :
+      Rx.Observable.of('a', 'b', 'c')
+  );
+
+result$.subscribe(
+  x => console.log(x),
+  e => console.error(e)  // Here the error can be handled
+);
+            </code></pre>
+            <small><a href="https://jsbin.com/seluli/edit?js,console">jsbin</a></small>
+          </section>
+
+          <section>
+            <h3>Error and retry</h3>
+            <p>
+              Error handling can also be added to the pipeline. Operators such as
+              <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-retry"><code>retry</code></a>,
+              <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-retryWhen"><code>retryWhen</code></a>
+              and
+              <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-catch"><code>catch</code></a>
+              are available.
+            </p>
+            <pre><code data-trim class="javascript">
+const interval$ = Rx.Observable.interval(100);
+const result$ = interval$
+  .mergeMap(x =>
+    x === 3 ?
+      Rx.Observable.throw(`I don't like threes`) :
+      Rx.Observable.of(`passed ${x}`)
+  )
+  .retry(2)
+  .catch((error) => Rx.Observable.of(
+    `My fallback value. Error was: ${error}`));
+
+result$.subscribe(x => console.log(x));
+            </code></pre>
+            <small><a href="https://jsbin.com/lilaxe/edit?js,console">jsbin</a></small>
+          </section>
+        </section>
+
+        <section data-markdown>
+          <script type="text/template">
+            ### Angular 2
+
+            ![ng2 logo](https://raw.githubusercontent.com/angular/angular.io/master/public/resources/images/logos/angular2/angular.png) <!-- .element: style="border: none; box-shadow: none;" -->
+
+            - Use RxJS internally to implement core logic such as `EventEmitter`
+            - Uses it in public API, e.g. in Forms and the HTTP module
+          </script>
+        </section>
+
+        <section data-markdown>
+          ### Code samples
+
+          - [Redux: A minimalistic RxJS implementation](https://jsbin.com/furelam/edit?js,console)
+          - [Angular 2: Isolate components with RxJS](http://plnkr.co/edit/zL67mT7mbJ6kbjsAPtCJ?p=preview)
+          - Drag and drop implementation: [Easy](https://jsfiddle.net/djwfyxs5/), [Advanced](https://jsfiddle.net/bq8s4dbt/)
+          - Error handling: [Automatic retry with `retryWhen`](https://jsbin.com/behofo/edit?js,console)
+
+        </section>
+
+        <section>
+          <section data-markdown>
+            ### References / Resources
+
+            - [RxJS API Doc](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html) and [Manual](http://reactivex.io/rxjs/manual/index.html)
+            - [The introduction to Reactive Programming you've been missing](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754) (RxJS 4)
+            - [RxJS Doc: Error handling](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/errors.md)
+            - [Introduction to Reactive Programming](https://egghead.io/courses/introduction-to-reactive-programming) (egghead.io)
+            - [Creating Observables from scratch](https://egghead.io/courses/rxjs-beyond-the-basics-creating-observables-from-scratch) (egghead.io)
+            - [Operators in Depth](https://egghead.io/courses/rxjs-beyond-the-basics-creating-observables-from-scratch) (egghead.io)
+          </section>
+
+          <section data-markdown>
+            ### References / Resources - Angular 2
+
+            - [Build Redux Style Applications with Angular2, RxJS and ngrx/store](https://egghead.io/courses/building-a-time-machine-with-angular-2-and-rxjs) (egghead.io)
+            - [Learn the Basics of Angular 2 Forms](https://egghead.io/courses/intro-to-angular-2-forms) (egghead.io)
+
+          </section>
+        </section>
+
+      </div>
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+      // More info https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        history: true,
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+          { src: 'plugin/markdown/marked.js' },
+          { src: 'plugin/markdown/markdown.js' },
+          { src: 'plugin/notes/notes.js', async: true },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+        ]
+      });
+    </script>
+  </body>
+</html>
