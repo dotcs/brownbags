@@ -49,6 +49,7 @@
             * Gained a lot of popularity through Google's decision to use it in Angular 2
             * Is framework-agnostic and has no dependencies
             * Follows the functional reactive programming approach
+            * Is part of a large [Rx* Family](http://reactivex.io/languages.html): RxJava, RxScala, RxClosure, RxPY, ...
             * <mark>Demos in this presentation will use RxJS 5</mark>
           </script>
         </section>
@@ -83,11 +84,13 @@ Rx.Observable.from(data)
 
         <section>
           <section data-markdown>
-            ### Reactive programming
+            <script type="text/template">
+              ### Reactive programming
 
-            > [Reactive programming] means that it should be possible to express static or dynamic data flows with ease in the programming languages used, and that the underlying execution model will automatically propagate changes through the data flow.
-            >
-            > [Wikipedia (Reactive programming)](https://en.wikipedia.org/wiki/Reactive_programming)
+              > [Reactive programming] means that it should be possible to express static or dynamic data flows with ease in the programming languages used, and that <mark>the underlying execution model will automatically propagate changes through the data flow</mark>.
+              >
+              > [en.wikipedia.org (Reactive programming)](https://en.wikipedia.org/wiki/Reactive_programming)
+            </script>
           </section>
 
           <section data-markdown>
@@ -103,6 +106,11 @@ Rx.Observable.from(data)
 
           <section>
             <h3>Reactive programming</h3>
+            <ul>
+              <li>Write pipeline with no side effects</li>
+              <li>Put side effects at a common place (in subscribe call)</li>
+              <li>Application state is put into the Observables</li>
+            </ul>
             <pre><code data-trim class="javascript">
 // Describe data pipeline
 const stream$ = new Rx.Subject()
@@ -137,7 +145,7 @@ stream$.next([1]);
         </section>
 
         <section>
-          <h3><mark>Caution</mark>: Values of Observables are not immutable by default!</h3>
+          <h3>Caution!<br> Values of Observables are <mark>not immutable by default</mark>!</h3>
           <pre><code data-trim class="javascript">
 const stream$ = Rx.Observable.of({ test: true });
 const stream2$ = stream$
@@ -160,29 +168,30 @@ stream$.subscribe(x => console.log(x));  // Because the underlying
           </p>
         </section>
 
-        <section data-markdown>
-          <script type="text/template" data-noescape>
-            ### Subscription
+        <section>
+          <h3>Subscription</h3>
 
-            Observable's life span:
-            <mark>(next)* (complete|error)</mark>
+          <p>
+            Observable's life span: <mark>(next)* (complete|error)</mark>
+          </p>
 
-            - Run forever
-            - Complete
-            - Throw an error
+          <ul>
+            <li>Run forever</li>
+            <li>Complete</li>
+            <li>Throw an error</li>
+          </ul>
 
-            <div class="fragment">
-              <p>Thus subscriptions provide three callback methods</p>
-              <pre><code data-trim class="javascript">
+          <div class="fragment">
+            <p>Thus subscriptions provide three callback methods</p>
+            <pre><code data-trim class="javascript">
 const stream$ = Rx.Observable.from( ... );
 stream$.subscribe(
   (next)  => { /* called on next value */ },
   (error) => { /* called in case of an (unhandled) error */  },
   ()      => { /* called when the observable completes */ }
 );
-              </code></pre>
-            </div>
-          </script>
+            </code></pre>
+          </div>
         </section>
 
         <section>
