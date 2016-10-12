@@ -10,3 +10,17 @@
 .mdl-card {
   width: auto;
 }
+
+.search-result-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+}
+.search-result-info.is-hidden {
+  display: none;
+}
+
+.mdlx-chip--icon {
+  line-height: 44px;
+}

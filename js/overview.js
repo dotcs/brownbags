@@ -9678,6 +9678,143 @@ var _user$project$Main$cardView = function (card) {
 					])) : _elm_lang$html$Html$text('')
 			]));
 };
+var _user$project$Main$filterBrownbags = F2(
+	function (query, brownbag) {
+		return A2(
+			_elm_lang$core$String$contains,
+			_elm_lang$core$String$toLower(query),
+			_elm_lang$core$String$toLower(brownbag.title)) || A2(
+			_elm_lang$core$String$contains,
+			_elm_lang$core$String$toLower(query),
+			_elm_lang$core$String$toLower(brownbag.description));
+	});
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'MsgNothing':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'UpdateSearchQuery':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{query: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ToggleSearch':
+				var newSearchOpen = _elm_lang$core$Basics$not(model.searchOpen);
+				var newQuery = newSearchOpen ? model.query : '';
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{searchOpen: newSearchOpen, query: newQuery}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'MaybeResetSearch':
+				var newSearchOpen = _elm_lang$core$Native_Utils.cmp(
+					_elm_lang$core$String$length(model.query),
+					0) > 0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{searchOpen: newSearchOpen}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{searchOpen: false, query: ''}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+		}
+	});
+var _user$project$Main$Model = F3(
+	function (a, b, c) {
+		return {brownbags: a, query: b, searchOpen: c};
+	});
+var _user$project$Main$Brownbag = F4(
+	function (a, b, c, d) {
+		return {title: a, description: b, presentedAt: c, available: d};
+	});
+var _user$project$Main$Page = F6(
+	function (a, b, c, d, e, f) {
+		return {title: a, content: b, githubUser: c, query: d, searchOpen: e, countResults: f};
+	});
+var _user$project$Main$Card = F7(
+	function (a, b, c, d, e, f, g) {
+		return {title: a, description: b, btnText: c, btnHref: d, accessable: e, checked: f, checkedIconTooltip: g};
+	});
+var _user$project$Main$NotPresented = {ctor: 'NotPresented'};
+var _user$project$Main$brownbagCardView = function (brownbag) {
+	return _user$project$Main$cardView(
+		{
+			title: brownbag.title,
+			description: A2(
+				_evancz$elm_markdown$Markdown$toHtml,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				brownbag.description),
+			btnText: 'Show presentation',
+			btnHref: A2(
+				_elm_lang$core$Basics_ops['++'],
+				'index-',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$String$toLower(brownbag.title),
+					'.html')),
+			accessable: brownbag.available,
+			checked: _elm_lang$core$Basics$not(
+				_elm_lang$core$Native_Utils.eq(brownbag.presentedAt, _user$project$Main$NotPresented)),
+			checkedIconTooltip: function () {
+				var _p1 = brownbag.presentedAt;
+				if (_p1.ctor === 'PresentedAt') {
+					return _elm_lang$core$Maybe$Just(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'presented at ',
+							A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config.format.date, _p1._0)));
+				} else {
+					return _elm_lang$core$Maybe$Nothing;
+				}
+			}()
+		});
+};
+var _user$project$Main$PresentedAt = function (a) {
+	return {ctor: 'PresentedAt', _0: a};
+};
+var _user$project$Main$init = {
+	ctor: '_Tuple2',
+	_0: {
+		brownbags: _elm_lang$core$Native_List.fromArray(
+			[
+				{
+				title: 'RxJS',
+				presentedAt: _user$project$Main$PresentedAt(
+					A2(
+						_elm_lang$core$Result$withDefault,
+						_elm_lang$core$Date$fromTime(0),
+						_elm_lang$core$Date$fromString('2016/10/05'))),
+				available: true,
+				description: '\nTalk for beginners that introduces [RxJS (Reactive Extensions for Javascript)](http://reactivex.io/rxjs/) developed by Microsoft.\n\nThis presentation covers:\n* Introduction to functional and reactive programming\n* Observables API discussion\n* Marble diagrams\n* Comparison of cold and hot Observables\n* Combining Observables with operators\n* Error handling\n* Observables in Angular 2\n* Outlook: Standardization process of Observables\n\nAll examples given in this talk are written in RxJS 5.\n'
+			},
+				{title: 'Elm', available: false, description: '\nIntroduction to Elm.\n', presentedAt: _user$project$Main$NotPresented}
+			]),
+		query: '',
+		searchOpen: false
+	},
+	_1: _elm_lang$core$Platform_Cmd$none
+};
+var _user$project$Main$ResetSearch = {ctor: 'ResetSearch'};
+var _user$project$Main$MaybeResetSearch = {ctor: 'MaybeResetSearch'};
+var _user$project$Main$ToggleSearch = {ctor: 'ToggleSearch'};
+var _user$project$Main$UpdateSearchQuery = function (a) {
+	return {ctor: 'UpdateSearchQuery', _0: a};
+};
 var _user$project$Main$pageLayoutView = function (page) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -9732,6 +9869,75 @@ var _user$project$Main$pageLayoutView = function (page) {
 									]),
 								_elm_lang$core$Native_List.fromArray(
 									[])),
+								A2(
+								_elm_lang$html$Html$div,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$classList(
+										_elm_lang$core$Native_List.fromArray(
+											[
+												{ctor: '_Tuple2', _0: 'mdl-textfield', _1: true},
+												{ctor: '_Tuple2', _0: 'mdl-js-textfield', _1: true},
+												{ctor: '_Tuple2', _0: 'mdl-textfield--expandable', _1: true},
+												{ctor: '_Tuple2', _0: 'mdl-textfield-textfield--floating-label', _1: true},
+												{ctor: '_Tuple2', _0: 'mdl-textfield--align-right', _1: true},
+												{ctor: '_Tuple2', _0: 'is-focused', _1: page.searchOpen},
+												{
+												ctor: '_Tuple2',
+												_0: 'is-dirty',
+												_1: _elm_lang$core$Native_Utils.cmp(
+													_elm_lang$core$String$length(page.query),
+													0) > 0
+											}
+											]))
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										A2(
+										_elm_lang$html$Html$label,
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html_Attributes$class('mdl-button mdl-js-button mdl-button--icon'),
+												_elm_lang$html$Html_Attributes$for('search-exp')
+											]),
+										_elm_lang$core$Native_List.fromArray(
+											[
+												A2(
+												_elm_lang$html$Html$i,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html_Attributes$class('material-icons'),
+														_elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleSearch)
+													]),
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html$text('search')
+													]))
+											])),
+										A2(
+										_elm_lang$html$Html$div,
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html_Attributes$class('mdl-textfield__expandable-holder')
+											]),
+										_elm_lang$core$Native_List.fromArray(
+											[
+												A2(
+												_elm_lang$html$Html$input,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html_Attributes$class('mdl-textfield__input'),
+														_elm_lang$html$Html_Attributes$type$('text'),
+														_elm_lang$html$Html_Attributes$name('sample'),
+														_elm_lang$html$Html_Attributes$id('search-exp'),
+														_elm_lang$html$Html_Attributes$value(page.query),
+														_elm_lang$html$Html_Events$onInput(_user$project$Main$UpdateSearchQuery),
+														_elm_lang$html$Html_Events$onBlur(_user$project$Main$MaybeResetSearch)
+													]),
+												_elm_lang$core$Native_List.fromArray(
+													[]))
+											]))
+									])),
 								A2(
 								_elm_lang$html$Html$nav,
 								_elm_lang$core$Native_List.fromArray(
@@ -9788,67 +9994,102 @@ var _user$project$Main$pageLayoutView = function (page) {
 								_elm_lang$html$Html_Attributes$class('page-content')
 							]),
 						_elm_lang$core$Native_List.fromArray(
-							[page.content]))
+							[
+								A2(
+								_elm_lang$html$Html$div,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$classList(
+										_elm_lang$core$Native_List.fromArray(
+											[
+												{ctor: '_Tuple2', _0: 'search-result-info', _1: true},
+												{
+												ctor: '_Tuple2',
+												_0: 'is-hidden',
+												_1: _elm_lang$core$Native_Utils.cmp(page.countResults, 0) < 0
+											}
+											]))
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										A2(
+										_elm_lang$html$Html$span,
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html_Attributes$class('mdl-chip mdl-chip--contact')
+											]),
+										_elm_lang$core$Native_List.fromArray(
+											[
+												A2(
+												_elm_lang$html$Html$span,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html_Attributes$class('mdl-chip__contact mdl-color--indigo mdl-color-text--white mdlx-chip--icon')
+													]),
+												_elm_lang$core$Native_List.fromArray(
+													[
+														A2(
+														_elm_lang$html$Html$i,
+														_elm_lang$core$Native_List.fromArray(
+															[
+																_elm_lang$html$Html_Attributes$class('material-icons'),
+																_elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleSearch)
+															]),
+														_elm_lang$core$Native_List.fromArray(
+															[
+																_elm_lang$html$Html$text('search')
+															]))
+													])),
+												A2(
+												_elm_lang$html$Html$span,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html_Attributes$class('mdl-chip__text')
+													]),
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html$text(
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															_elm_lang$core$Basics$toString(page.countResults),
+															' Results'))
+													])),
+												A2(
+												_elm_lang$html$Html$span,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html_Attributes$class('mdl-chip__action')
+													]),
+												_elm_lang$core$Native_List.fromArray(
+													[
+														A2(
+														_elm_lang$html$Html$i,
+														_elm_lang$core$Native_List.fromArray(
+															[
+																_elm_lang$html$Html_Attributes$class('material-icons'),
+																_elm_lang$html$Html_Events$onClick(_user$project$Main$ResetSearch)
+															]),
+														_elm_lang$core$Native_List.fromArray(
+															[
+																_elm_lang$html$Html$text('cancel')
+															]))
+													]))
+											]))
+									])),
+								page.content
+							]))
 					]))
 			]));
 };
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p0 = msg;
-		return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-	});
-var _user$project$Main$Model = function (a) {
-	return {brownbags: a};
-};
-var _user$project$Main$Brownbag = F4(
-	function (a, b, c, d) {
-		return {title: a, description: b, presentedAt: c, available: d};
-	});
-var _user$project$Main$Page = F3(
-	function (a, b, c) {
-		return {title: a, content: b, githubUser: c};
-	});
-var _user$project$Main$Card = F7(
-	function (a, b, c, d, e, f, g) {
-		return {title: a, description: b, btnText: c, btnHref: d, accessable: e, checked: f, checkedIconTooltip: g};
-	});
-var _user$project$Main$NotPresented = {ctor: 'NotPresented'};
-var _user$project$Main$brownbagCardView = function (brownbag) {
-	return _user$project$Main$cardView(
-		{
-			title: brownbag.title,
-			description: A2(
-				_evancz$elm_markdown$Markdown$toHtml,
-				_elm_lang$core$Native_List.fromArray(
-					[]),
-				brownbag.description),
-			btnText: 'Show presentation',
-			btnHref: A2(
-				_elm_lang$core$Basics_ops['++'],
-				'index-',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$String$toLower(brownbag.title),
-					'.html')),
-			accessable: brownbag.available,
-			checked: _elm_lang$core$Basics$not(
-				_elm_lang$core$Native_Utils.eq(brownbag.presentedAt, _user$project$Main$NotPresented)),
-			checkedIconTooltip: function () {
-				var _p1 = brownbag.presentedAt;
-				if (_p1.ctor === 'PresentedAt') {
-					return _elm_lang$core$Maybe$Just(
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							'presented at ',
-							A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config.format.date, _p1._0)));
-				} else {
-					return _elm_lang$core$Maybe$Nothing;
-				}
-			}()
-		});
-};
 var _user$project$Main$view = function (model) {
-	var cards = A2(_elm_lang$core$List$map, _user$project$Main$brownbagCardView, model.brownbags);
+	var brownbags = A2(
+		_elm_lang$core$List$filter,
+		_user$project$Main$filterBrownbags(model.query),
+		model.brownbags);
+	var cards = A2(_elm_lang$core$List$map, _user$project$Main$brownbagCardView, brownbags);
+	var countResults = (_elm_lang$core$Native_Utils.cmp(
+		_elm_lang$core$String$length(model.query),
+		0) > 0) ? _elm_lang$core$List$length(cards) : -1;
 	var page = {
 		title: 'Brownbags',
 		content: A2(
@@ -9877,32 +10118,12 @@ var _user$project$Main$view = function (model) {
 						},
 						cards))
 				])),
-		githubUser: 'dotcs'
+		githubUser: 'dotcs',
+		query: model.query,
+		searchOpen: model.searchOpen,
+		countResults: countResults
 	};
 	return _user$project$Main$pageLayoutView(page);
-};
-var _user$project$Main$PresentedAt = function (a) {
-	return {ctor: 'PresentedAt', _0: a};
-};
-var _user$project$Main$init = {
-	ctor: '_Tuple2',
-	_0: {
-		brownbags: _elm_lang$core$Native_List.fromArray(
-			[
-				{
-				title: 'RxJS',
-				presentedAt: _user$project$Main$PresentedAt(
-					A2(
-						_elm_lang$core$Result$withDefault,
-						_elm_lang$core$Date$fromTime(0),
-						_elm_lang$core$Date$fromString('2016/10/05'))),
-				available: true,
-				description: '\nTalk for beginners that introduces [RxJS (Reactive Extensions for Javascript)](http://reactivex.io/rxjs/) developed by Microsoft.\n\nThis presentation covers:\n* Introduction to functional and reactive programming\n* Observables API discussion\n* Marble diagrams\n* Comparison of cold and hot Observables\n* Combining Observables with operators\n* Error handling\n* Observables in Angular 2\n* Outlook: Standardization process of Observables\n\nAll examples given in this talk are written in RxJS 5.\n'
-			},
-				{title: 'Elm', available: false, description: '\nIntroduction to Elm.\n', presentedAt: _user$project$Main$NotPresented}
-			])
-	},
-	_1: _elm_lang$core$Platform_Cmd$none
 };
 var _user$project$Main$main = {
 	main: _elm_lang$html$Html_App$program(

@@ -12,7 +12,10 @@ import String
 
 
 type alias Model =
-    { brownbags : List Brownbag }
+    { brownbags : List Brownbag
+    , query : String
+    , searchOpen : Bool
+    }
 
 
 type Presented
@@ -58,6 +61,8 @@ Introduction to Elm.
               , presentedAt = NotPresented
               }
             ]
+      , query = ""
+      , searchOpen = False
       }
     , Cmd.none
     )
@@ -65,6 +70,10 @@ Introduction to Elm.
 
 type Msg
     = MsgNothing
+    | UpdateSearchQuery String
+    | ToggleSearch
+    | MaybeResetSearch
+    | ResetSearch
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -73,12 +82,53 @@ update msg model =
         MsgNothing ->
             ( model, Cmd.none )
 
+        UpdateSearchQuery newQuery ->
+            ( { model | query = newQuery }, Cmd.none )
+
+        ToggleSearch ->
+            let
+                newSearchOpen =
+                    not model.searchOpen
+
+                newQuery =
+                    if newSearchOpen then
+                        model.query
+                    else
+                        ""
+            in
+                ( { model | searchOpen = newSearchOpen, query = newQuery }, Cmd.none )
+
+        MaybeResetSearch ->
+            let
+                newSearchOpen =
+                    String.length model.query > 0
+            in
+                ( { model | searchOpen = newSearchOpen }, Cmd.none )
+
+        ResetSearch ->
+            ( { model | searchOpen = False, query = "" }, Cmd.none )
+
+
+filterBrownbags : String -> Brownbag -> Bool
+filterBrownbags query brownbag =
+    (String.contains (String.toLower query) (String.toLower brownbag.title))
+        || (String.contains (String.toLower query) (String.toLower brownbag.description))
+
 
 view : Model -> Html Msg
 view model =
     let
+        brownbags =
+            (List.filter (filterBrownbags model.query) model.brownbags)
+
         cards =
-            (List.map brownbagCardView model.brownbags)
+            (List.map brownbagCardView brownbags)
+
+        countResults =
+            if String.length model.query > 0 then
+                List.length cards
+            else
+                -1
 
         page =
             { title = "Brownbags"
@@ -88,6 +138,9 @@ view model =
                         (List.map (\card -> div [ class "mdl-cell mdl-cell--4-col" ] [ card ]) cards)
                     ]
             , githubUser = "dotcs"
+            , query = model.query
+            , searchOpen = model.searchOpen
+            , countResults = countResults
             }
     in
         pageLayoutView page
@@ -97,6 +150,9 @@ type alias Page =
     { title : String
     , content : Html Msg
     , githubUser : String
+    , query : String
+    , searchOpen : Bool
+    , countResults : Int
     }
 
 
@@ -110,6 +166,33 @@ pageLayoutView page =
                     , span [ class "title-author" ] [ text (" by " ++ page.githubUser) ]
                     ]
                 , div [ class "mdl-layout-spacer" ] []
+                , div
+                    [ classList
+                        [ ( "mdl-textfield", True )
+                        , ( "mdl-js-textfield", True )
+                        , ( "mdl-textfield--expandable", True )
+                        , ( "mdl-textfield-textfield--floating-label", True )
+                        , ( "mdl-textfield--align-right", True )
+                        , ( "is-focused", page.searchOpen )
+                        , ( "is-dirty", (String.length page.query > 0) )
+                        ]
+                    ]
+                    [ label [ class "mdl-button mdl-js-button mdl-button--icon", for "search-exp" ]
+                        [ i [ class "material-icons", onClick ToggleSearch ] [ text "search" ]
+                        ]
+                    , div [ class "mdl-textfield__expandable-holder" ]
+                        [ input
+                            [ class "mdl-textfield__input"
+                            , type' "text"
+                            , name "sample"
+                            , id "search-exp"
+                            , value page.query
+                            , onInput UpdateSearchQuery
+                            , onBlur MaybeResetSearch
+                            ]
+                            []
+                        ]
+                    ]
                 , nav [ class "mdl-navigation mdl-layout--large-screen-only" ]
                     [ a
                         [ class "mdl-navigation__link"
@@ -123,7 +206,20 @@ pageLayoutView page =
                 ]
             ]
         , main' []
-            [ div [ class "page-content" ] [ page.content ]
+            [ div [ class "page-content" ]
+                [ div [ classList [ ( "search-result-info", True ), ( "is-hidden", page.countResults < 0 ) ] ]
+                    [ span [ class "mdl-chip mdl-chip--contact" ]
+                        [ span [ class "mdl-chip__contact mdl-color--indigo mdl-color-text--white mdlx-chip--icon" ]
+                            [ i [ class "material-icons", onClick ToggleSearch ] [ text "search" ]
+                            ]
+                        , span [ class "mdl-chip__text" ] [ text (toString page.countResults ++ " Results") ]
+                        , span [ class "mdl-chip__action" ]
+                            [ i [ class "material-icons", onClick ResetSearch ] [ text "cancel" ]
+                            ]
+                        ]
+                    ]
+                , page.content
+                ]
             ]
         ]
 
