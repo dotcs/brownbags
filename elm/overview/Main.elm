@@ -18,15 +18,11 @@ type alias Model =
     }
 
 
-type Presented
-    = PresentedAt Date.Date
-    | NotPresented
-
-
 type alias Brownbag =
     { title : String
     , description : String
-    , presentedAt : Presented
+    , presentedAt : Maybe Date.Date
+    , lastUpdated : Maybe Date.Date
     , available : Bool
     }
 
@@ -35,7 +31,8 @@ init : ( Model, Cmd Msg )
 init =
     ( { brownbags =
             [ { title = "RxJS"
-              , presentedAt = PresentedAt (Date.fromString "2016/10/05" |> Result.withDefault (Date.fromTime 0))
+              , presentedAt = Just (Date.fromString "2016/10/05" |> Result.withDefault (Date.fromTime 0))
+              , lastUpdated = Just (Date.fromString "2016/10/04" |> Result.withDefault (Date.fromTime 0))
               , available = True
               , description = """
 Talk for beginners that introduces [RxJS (Reactive Extensions for Javascript)](http://reactivex.io/rxjs/) developed by Microsoft.
@@ -55,10 +52,11 @@ All examples given in this talk are written in RxJS 5.
               }
             , { title = "Elm"
               , available = False
+              , lastUpdated = Nothing
               , description = """
 Introduction to Elm.
 """
-              , presentedAt = NotPresented
+              , presentedAt = Nothing
               }
             ]
       , query = ""
@@ -232,14 +230,8 @@ brownbagCardView brownbag =
         , btnText = "Show presentation"
         , btnHref = ("index-" ++ String.toLower brownbag.title ++ ".html")
         , accessable = brownbag.available
-        , checked = not (brownbag.presentedAt == NotPresented)
-        , checkedIconTooltip =
-            case brownbag.presentedAt of
-                PresentedAt date ->
-                    Just ("presented at " ++ (format config config.format.date date))
-
-                NotPresented ->
-                    Nothing
+        , checkedAt = brownbag.presentedAt
+        , lastUpdated = brownbag.lastUpdated
         }
 
 
@@ -249,8 +241,8 @@ type alias Card =
     , btnText : String
     , btnHref : String
     , accessable : Bool
-    , checked : Bool
-    , checkedIconTooltip : Maybe String
+    , checkedAt : Maybe Date.Date
+    , lastUpdated : Maybe Date.Date
     }
 
 
@@ -272,10 +264,21 @@ cardView card =
                 ]
           else
             text ""
-        , if card.checked then
+        , if card.checkedAt /= Nothing then
             div [ class "mdl-card__menu" ]
                 [ button [ class "mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" ]
-                    [ i [ class "material-icons", title (Maybe.withDefault "" card.checkedIconTooltip) ] [ text "check circle" ]
+                    [ i
+                        [ class "material-icons"
+                        , title ("last changed " ++ (format config config.format.date (Maybe.withDefault (Date.fromTime 0) card.lastUpdated)))
+                        ]
+                        [ text "track_changes" ]
+                    ]
+                , button [ class "mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" ]
+                    [ i
+                        [ class "material-icons"
+                        , title ("presented at " ++ (format config config.format.date (Maybe.withDefault (Date.fromTime 0) card.checkedAt)))
+                        ]
+                        [ text "check circle" ]
                     ]
                 ]
           else

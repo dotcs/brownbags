@@ -9646,7 +9646,7 @@ var _user$project$Main$cardView = function (card) {
 								_elm_lang$html$Html$text(card.btnText)
 							]))
 					])) : _elm_lang$html$Html$text(''),
-				card.checked ? A2(
+				(!_elm_lang$core$Native_Utils.eq(card.checkedAt, _elm_lang$core$Maybe$Nothing)) ? A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
 					[
@@ -9668,7 +9668,48 @@ var _user$project$Main$cardView = function (card) {
 									[
 										_elm_lang$html$Html_Attributes$class('material-icons'),
 										_elm_lang$html$Html_Attributes$title(
-										A2(_elm_lang$core$Maybe$withDefault, '', card.checkedIconTooltip))
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											'last changed ',
+											A3(
+												_rluiten$elm_date_extra$Date_Extra_Format$format,
+												_rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config,
+												_rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config.format.date,
+												A2(
+													_elm_lang$core$Maybe$withDefault,
+													_elm_lang$core$Date$fromTime(0),
+													card.lastUpdated))))
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html$text('track_changes')
+									]))
+							])),
+						A2(
+						_elm_lang$html$Html$button,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$i,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$class('material-icons'),
+										_elm_lang$html$Html_Attributes$title(
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											'presented at ',
+											A3(
+												_rluiten$elm_date_extra$Date_Extra_Format$format,
+												_rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config,
+												_rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config.format.date,
+												A2(
+													_elm_lang$core$Maybe$withDefault,
+													_elm_lang$core$Date$fromTime(0),
+													card.checkedAt))))
 									]),
 								_elm_lang$core$Native_List.fromArray(
 									[
@@ -9677,6 +9718,28 @@ var _user$project$Main$cardView = function (card) {
 							]))
 					])) : _elm_lang$html$Html$text('')
 			]));
+};
+var _user$project$Main$brownbagCardView = function (brownbag) {
+	return _user$project$Main$cardView(
+		{
+			title: brownbag.title,
+			description: A2(
+				_evancz$elm_markdown$Markdown$toHtml,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				brownbag.description),
+			btnText: 'Show presentation',
+			btnHref: A2(
+				_elm_lang$core$Basics_ops['++'],
+				'index-',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$String$toLower(brownbag.title),
+					'.html')),
+			accessable: brownbag.available,
+			checkedAt: brownbag.presentedAt,
+			lastUpdated: brownbag.lastUpdated
+		});
 };
 var _user$project$Main$filterBrownbags = F2(
 	function (query, brownbag) {
@@ -9733,60 +9796,6 @@ var _user$project$Main$update = F2(
 				};
 		}
 	});
-var _user$project$Main$Model = F3(
-	function (a, b, c) {
-		return {brownbags: a, query: b, searchOpen: c};
-	});
-var _user$project$Main$Brownbag = F4(
-	function (a, b, c, d) {
-		return {title: a, description: b, presentedAt: c, available: d};
-	});
-var _user$project$Main$Page = F6(
-	function (a, b, c, d, e, f) {
-		return {title: a, content: b, githubUser: c, query: d, searchOpen: e, countResults: f};
-	});
-var _user$project$Main$Card = F7(
-	function (a, b, c, d, e, f, g) {
-		return {title: a, description: b, btnText: c, btnHref: d, accessable: e, checked: f, checkedIconTooltip: g};
-	});
-var _user$project$Main$NotPresented = {ctor: 'NotPresented'};
-var _user$project$Main$brownbagCardView = function (brownbag) {
-	return _user$project$Main$cardView(
-		{
-			title: brownbag.title,
-			description: A2(
-				_evancz$elm_markdown$Markdown$toHtml,
-				_elm_lang$core$Native_List.fromArray(
-					[]),
-				brownbag.description),
-			btnText: 'Show presentation',
-			btnHref: A2(
-				_elm_lang$core$Basics_ops['++'],
-				'index-',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$String$toLower(brownbag.title),
-					'.html')),
-			accessable: brownbag.available,
-			checked: _elm_lang$core$Basics$not(
-				_elm_lang$core$Native_Utils.eq(brownbag.presentedAt, _user$project$Main$NotPresented)),
-			checkedIconTooltip: function () {
-				var _p1 = brownbag.presentedAt;
-				if (_p1.ctor === 'PresentedAt') {
-					return _elm_lang$core$Maybe$Just(
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							'presented at ',
-							A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config.format.date, _p1._0)));
-				} else {
-					return _elm_lang$core$Maybe$Nothing;
-				}
-			}()
-		});
-};
-var _user$project$Main$PresentedAt = function (a) {
-	return {ctor: 'PresentedAt', _0: a};
-};
 var _user$project$Main$init = {
 	ctor: '_Tuple2',
 	_0: {
@@ -9794,21 +9803,42 @@ var _user$project$Main$init = {
 			[
 				{
 				title: 'RxJS',
-				presentedAt: _user$project$Main$PresentedAt(
+				presentedAt: _elm_lang$core$Maybe$Just(
 					A2(
 						_elm_lang$core$Result$withDefault,
 						_elm_lang$core$Date$fromTime(0),
 						_elm_lang$core$Date$fromString('2016/10/05'))),
+				lastUpdated: _elm_lang$core$Maybe$Just(
+					A2(
+						_elm_lang$core$Result$withDefault,
+						_elm_lang$core$Date$fromTime(0),
+						_elm_lang$core$Date$fromString('2016/10/04'))),
 				available: true,
 				description: '\nTalk for beginners that introduces [RxJS (Reactive Extensions for Javascript)](http://reactivex.io/rxjs/) developed by Microsoft.\n\nThis presentation covers:\n* Introduction to functional and reactive programming\n* Observables API discussion\n* Marble diagrams\n* Comparison of cold and hot Observables\n* Combining Observables with operators\n* Error handling\n* Observables in Angular 2\n* Outlook: Standardization process of Observables\n\nAll examples given in this talk are written in RxJS 5.\n'
 			},
-				{title: 'Elm', available: false, description: '\nIntroduction to Elm.\n', presentedAt: _user$project$Main$NotPresented}
+				{title: 'Elm', available: false, lastUpdated: _elm_lang$core$Maybe$Nothing, description: '\nIntroduction to Elm.\n', presentedAt: _elm_lang$core$Maybe$Nothing}
 			]),
 		query: '',
 		searchOpen: false
 	},
 	_1: _elm_lang$core$Platform_Cmd$none
 };
+var _user$project$Main$Model = F3(
+	function (a, b, c) {
+		return {brownbags: a, query: b, searchOpen: c};
+	});
+var _user$project$Main$Brownbag = F5(
+	function (a, b, c, d, e) {
+		return {title: a, description: b, presentedAt: c, lastUpdated: d, available: e};
+	});
+var _user$project$Main$Page = F6(
+	function (a, b, c, d, e, f) {
+		return {title: a, content: b, githubUser: c, query: d, searchOpen: e, countResults: f};
+	});
+var _user$project$Main$Card = F7(
+	function (a, b, c, d, e, f, g) {
+		return {title: a, description: b, btnText: c, btnHref: d, accessable: e, checkedAt: f, lastUpdated: g};
+	});
 var _user$project$Main$ResetSearch = {ctor: 'ResetSearch'};
 var _user$project$Main$MaybeResetSearch = {ctor: 'MaybeResetSearch'};
 var _user$project$Main$ToggleSearch = {ctor: 'ToggleSearch'};
