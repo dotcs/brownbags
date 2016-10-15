@@ -1,21 +1,35 @@
 module Main exposing (..)
 
-import Html.App as Html
+import Html.App as App
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Material
+import Material.Scheme
+import Material.Button as Button
+import Material.Options as Options exposing (css, when)
+import Material.Layout as Layout
+import Material.Card as Card
+import Material.Icon as Icon
+import Material.Chip as Chip
+import Material.Textfield as Textfield
+import Material.Elevation as Elevation
+import Material.Color as Color
+import Material.Tooltip as Tooltip
+import Material.Grid as Grid exposing (grid, cell, size, Device(..))
 import Date
 import Date.Extra.Config.Config_en_us exposing (config)
 import Date.Extra.Format as Format exposing (format, formatUtc, isoMsecOffsetFormat)
 import Markdown
 import String
+import Dom
+import Task
 
 
-type alias Model =
-    { brownbags : List Brownbag
-    , query : String
-    , searchOpen : Bool
-    }
+-- TYPES
+
+
+type alias Mdl =
+    Material.Model
 
 
 type alias Brownbag =
@@ -27,14 +41,27 @@ type alias Brownbag =
     }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( { brownbags =
-            [ { title = "RxJS"
-              , presentedAt = Just (Date.fromString "2016/10/05" |> Result.withDefault (Date.fromTime 0))
-              , lastUpdated = Just (Date.fromString "2016/10/04" |> Result.withDefault (Date.fromTime 0))
-              , available = True
-              , description = """
+
+-- MODEL
+
+
+type alias Model =
+    { mdl : Material.Model
+    , brownbags : List Brownbag
+    , query : String
+    , searchOpen : Bool
+    }
+
+
+model : Model
+model =
+    { mdl = Material.model
+    , brownbags =
+        [ { title = "RxJS"
+          , presentedAt = Just (Date.fromString "2016/10/05" |> Result.withDefault (Date.fromTime 0))
+          , lastUpdated = Just (Date.fromString "2016/10/04" |> Result.withDefault (Date.fromTime 0))
+          , available = True
+          , description = """
 Talk for beginners that introduces [RxJS (Reactive Extensions for Javascript)](http://reactivex.io/rxjs/) developed by Microsoft.
 
 This presentation covers:
@@ -49,27 +76,31 @@ This presentation covers:
 
 All examples given in this talk are written in RxJS 5.
 """
-              }
-            , { title = "Elm"
-              , available = False
-              , lastUpdated = Nothing
-              , description = """
+          }
+        , { title = "Elm"
+          , available = False
+          , lastUpdated = Nothing
+          , description = """
 Introduction to Elm.
 """
-              , presentedAt = Nothing
-              }
-            ]
-      , query = ""
-      , searchOpen = False
-      }
-    , Cmd.none
-    )
+          , presentedAt = Nothing
+          }
+        ]
+    , query = ""
+    , searchOpen = False
+    }
+
+
+
+-- UPDATE
 
 
 type Msg
-    = MsgNothing
+    = Mdl (Material.Msg Msg)
+      -- Boilerplate: Msg clause for internal Mdl messages.
+    | NoOp
     | UpdateSearchQuery String
-    | ToggleSearch
+    | OpenOrClearSearch
     | MaybeResetSearch
     | ResetSearch
 
@@ -77,40 +108,78 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        MsgNothing ->
-            ( model, Cmd.none )
+        -- Boilerplate: Mdl action handler.
+        Mdl msg' ->
+            Material.update msg' model
+
+        NoOp ->
+            model ! []
 
         UpdateSearchQuery newQuery ->
-            ( { model | query = newQuery }, Cmd.none )
+            { model | query = newQuery } ! []
 
-        ToggleSearch ->
+        OpenOrClearSearch ->
             let
                 newSearchOpen =
                     not model.searchOpen
 
                 newQuery =
-                    if newSearchOpen then
+                    if newSearchOpen == True then
                         model.query
                     else
                         ""
+
+                focus =
+                    Dom.focus "brownbag-search"
+
+                cmd =
+                    if newSearchOpen == True then
+                        Task.perform (\_ -> NoOp) (\_ -> NoOp) focus
+                    else
+                        Cmd.none
             in
-                ( { model | searchOpen = newSearchOpen, query = newQuery }, Cmd.none )
+                ( { model | searchOpen = newSearchOpen, query = newQuery }, cmd )
 
         MaybeResetSearch ->
             let
                 newSearchOpen =
                     String.length model.query > 0
             in
-                ( { model | searchOpen = newSearchOpen }, Cmd.none )
+                { model | searchOpen = newSearchOpen } ! []
 
         ResetSearch ->
-            ( { model | searchOpen = False, query = "" }, Cmd.none )
+            { model | searchOpen = False, query = "" } ! []
 
 
 filterBrownbags : String -> Brownbag -> Bool
 filterBrownbags query brownbag =
     (String.contains (String.toLower query) (String.toLower brownbag.title))
         || (String.contains (String.toLower query) (String.toLower brownbag.description))
+
+
+
+-- VIEW
+
+
+type alias Page =
+    { title : String
+    , content : Html Msg
+    , githubUser : String
+    , query : String
+    , searchOpen : Bool
+    , countResults : Int
+    }
+
+
+type alias Card =
+    { title : String
+    , description : Html Msg
+    , btnText : String
+    , btnHref : String
+    , accessable : Bool
+    , checkedAt : Maybe Date.Date
+    , lastUpdated : Maybe Date.Date
+    }
 
 
 view : Model -> Html Msg
@@ -131,95 +200,90 @@ view model =
         page =
             { title = "Brownbags"
             , content =
-                div []
-                    [ div [ class "mdl-grid" ]
-                        (List.map (\card -> div [ class "mdl-cell mdl-cell--4-col" ] [ card ]) cards)
-                    ]
+                grid []
+                    (List.map (\card -> cell [ Grid.size Desktop 4, Grid.size Phone 4 ] [ card ]) cards)
             , githubUser = "dotcs"
             , query = model.query
             , searchOpen = model.searchOpen
             , countResults = countResults
             }
     in
-        pageLayoutView page
+        Layout.render Mdl
+            model.mdl
+            []
+            { header = header page
+            , drawer = []
+            , tabs = ( [], [] )
+            , main =
+                [ div [ class "page-content" ] (content page) ]
+            }
 
 
-type alias Page =
-    { title : String
-    , content : Html Msg
-    , githubUser : String
-    , query : String
-    , searchOpen : Bool
-    , countResults : Int
-    }
-
-
-pageLayoutView : Page -> Html Msg
-pageLayoutView page =
-    div [ class "mdl-layout mdl-js-layout mdl-layout--fixed-header" ]
-        [ header [ class "mdl-layout__header" ]
-            [ div [ class "mdl-layout__header-row" ]
-                [ span [ class "mdl-layout-title" ]
-                    [ text page.title
-                    , span [ class "title-author" ] [ text (" by " ++ page.githubUser) ]
-                    ]
-                , div [ class "mdl-layout-spacer" ] []
-                , div
-                    [ classList
-                        [ ( "mdl-textfield", True )
-                        , ( "mdl-js-textfield", True )
-                        , ( "mdl-textfield--expandable", True )
-                        , ( "mdl-textfield-textfield--floating-label", True )
-                        , ( "mdl-textfield--align-right", True )
-                        , ( "is-focused", page.searchOpen )
-                        , ( "is-dirty", (String.length page.query > 0) )
-                        ]
-                    ]
-                    [ label [ class "mdl-button mdl-js-button mdl-button--icon", for "search-exp" ]
-                        [ i [ class "material-icons", onClick ToggleSearch ] [ text "search" ]
-                        ]
-                    , div [ class "mdl-textfield__expandable-holder" ]
-                        [ input
-                            [ class "mdl-textfield__input"
-                            , type' "text"
-                            , name "sample"
-                            , id "search-exp"
-                            , value page.query
-                            , onInput UpdateSearchQuery
-                            , onBlur MaybeResetSearch
-                            ]
-                            []
-                        ]
-                    ]
-                , nav [ class "mdl-navigation mdl-layout--large-screen-only" ]
-                    [ a
-                        [ class "mdl-navigation__link"
-                        , href ("https://github.com/" ++ String.toLower page.githubUser)
-                        ]
-                        [ span [ class "mdl-button mdl-js-button mdl-button--icon" ]
-                            [ i [ class "octicon octicon-mark-github", title page.githubUser ] []
-                            ]
-                        ]
-                    ]
-                ]
+header : Page -> List (Html Msg)
+header page =
+    [ Layout.row []
+        [ Layout.title []
+            [ text page.title
+            , span [ class "title-author" ] [ text (" by " ++ page.githubUser) ]
             ]
-        , main' []
-            [ div [ class "page-content" ]
-                [ div [ classList [ ( "search-result-info", True ), ( "is-hidden", page.countResults < 0 ) ] ]
-                    [ span [ class "mdl-chip mdl-chip--contact" ]
-                        [ span [ class "mdl-chip__contact mdl-color--indigo mdl-color-text--white mdlx-chip--icon" ]
-                            [ i [ class "material-icons", onClick ToggleSearch ] [ text "search" ]
-                            ]
-                        , span [ class "mdl-chip__text" ] [ text (toString page.countResults ++ " Results") ]
-                        , span [ class "mdl-chip__action" ]
-                            [ i [ class "material-icons", onClick ResetSearch ] [ text "cancel" ]
-                            ]
-                        ]
+        , Layout.spacer
+        , Button.render Mdl
+            [ 0 ]
+            model.mdl
+            [ Button.icon
+            , Button.onClick OpenOrClearSearch
+            ]
+            [ Icon.view
+                (if page.searchOpen then
+                    "clear"
+                 else
+                    "search"
+                )
+                []
+            ]
+        , Textfield.render Mdl
+            [ 0 ]
+            model.mdl
+            [ Textfield.floatingLabel
+            , Textfield.value page.query
+            , Textfield.onInput UpdateSearchQuery
+            , Textfield.onBlur MaybeResetSearch
+            , Options.inner [ Options.id "brownbag-search" ]
+            , (css "display" "none") `when` (not page.searchOpen)
+            , (css "width" "200px")
+            ]
+        , Layout.navigation []
+            [ Layout.link [ Layout.href ("https://github.com/" ++ String.toLower page.githubUser) ]
+                [ Button.render Mdl
+                    [ 0 ]
+                    model.mdl
+                    [ Button.icon
                     ]
-                , page.content
+                    [ i [ class "octicon octicon-mark-github", title page.githubUser ] [] ]
                 ]
             ]
         ]
+    ]
+
+
+content : Page -> List (Html Msg)
+content page =
+    [ if page.countResults > -1 then
+        div [ class "search-result-info" ]
+            [ Chip.span []
+                [ Chip.contact Html.span
+                    [ Color.background Color.primary
+                    , Color.text Color.white
+                    ]
+                    [ span [ class "mdlx-chip--icon" ] [ Icon.i "search" ] ]
+                , Chip.content []
+                    [ text (toString page.countResults ++ " results for '" ++ page.query ++ "'") ]
+                ]
+            ]
+      else
+        text ""
+    , page.content
+    ]
 
 
 brownbagCardView : Brownbag -> Html Msg
@@ -235,62 +299,65 @@ brownbagCardView brownbag =
         }
 
 
-type alias Card =
-    { title : String
-    , description : Html Msg
-    , btnText : String
-    , btnHref : String
-    , accessable : Bool
-    , checkedAt : Maybe Date.Date
-    , lastUpdated : Maybe Date.Date
-    }
-
-
 cardView : Card -> Html Msg
 cardView card =
-    div [ class "mdl-card mdl-shadow--2dp" ]
-        [ div [ class "mdl-card__title" ]
-            [ h2 [ class "mdl-card__title-text" ] [ text card.title ]
-            ]
-        , div [ class "mdl-card__supporting-text" ] [ card.description ]
-        , if card.accessable then
-            div [ class "mdl-card__actions mdl-card--border" ]
-                [ a
-                    [ class "mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-                      -- , disabled (not card.accessable)
-                    , href card.btnHref
-                    ]
-                    [ text card.btnText ]
-                ]
-          else
-            text ""
-        , if card.checkedAt /= Nothing then
-            div [ class "mdl-card__menu" ]
-                [ button [ class "mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" ]
+    let
+        menuItems =
+            if card.accessable then
+                [ Button.render Mdl
+                    [ 0 ]
+                    model.mdl
+                    [ Button.icon ]
                     [ i
                         [ class "material-icons"
                         , title ("last changed " ++ (format config config.format.date (Maybe.withDefault (Date.fromTime 0) card.lastUpdated)))
                         ]
                         [ text "track_changes" ]
                     ]
-                , button [ class "mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" ]
+                , Button.render Mdl
+                    [ 1 ]
+                    model.mdl
+                    [ Button.icon ]
                     [ i
                         [ class "material-icons"
                         , title ("presented at " ++ (format config config.format.date (Maybe.withDefault (Date.fromTime 0) card.checkedAt)))
                         ]
-                        [ text "check circle" ]
+                        [ text "check" ]
                     ]
                 ]
-          else
-            text ""
-        ]
+            else
+                []
+
+        actionItems =
+            [ if card.accessable then
+                Layout.link [ Layout.href card.btnHref ]
+                    [ Button.render Mdl
+                        [ 0 ]
+                        model.mdl
+                        [ Button.ripple, Button.accent ]
+                        [ text card.btnText ]
+                    ]
+              else
+                Button.render Mdl
+                    [ 0 ]
+                    model.mdl
+                    [ Button.disabled ]
+                    [ text card.btnText ]
+            ]
+    in
+        Card.view [ Elevation.e2 ]
+            [ Card.title [] [ Card.head [] [ text card.title ] ]
+            , Card.text [] [ card.description ]
+            , Card.menu [] menuItems
+            , Card.actions [ Card.border ] actionItems
+            ]
 
 
 main : Program Never
 main =
-    Html.program
-        { init = init
+    App.program
+        { init = ( model, Material.init Mdl )
         , view = view
         , update = update
-        , subscriptions = \model -> Sub.none
+        , subscriptions = Material.subscriptions Mdl
         }
