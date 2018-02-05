@@ -1,0 +1,222 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>TypeScript - Automated code style</title>
+
+  <link rel="stylesheet" href="css/reveal.css">
+  <link rel="stylesheet" href="css/theme/beige.css">
+
+  <!-- Theme used for syntax highlighting of code -->
+  <link rel="stylesheet" href="lib/css/zenburn.css">
+
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+    document.getElementsByTagName('head')[0].appendChild(link);
+  </script>
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <section data-markdown>
+        <script type="text/template">
+            # TypeScript<!-- .element: style="border: none; box-shadow: none; text-transform: none; " -->
+            ## Let me get you some automated code style
+
+            <small>by Fabian Mueller (
+              <svg height="26" width="26" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg>
+              : <a href="https://github.com/dotcs">dotcs</a>), last update: Feburary 2018</small>
+          </script>
+      </section>
+
+      <section data-markdown data-noescape>
+        <script type="text/template">
+          ## What are we talking about?
+
+          * Code is read more often than it is written
+          * JavaScript is an error-prone language
+          * Ask 100 programmers about code style and get 100 answers how it's done right
+            * Sometimes even more<!-- .element: class="fragment" -->
+            * Never less<!-- .element: class="fragment" -->
+        </script>
+      </section>
+
+      <section data-markdown data-noescape>
+        <script type="text/template">
+          ### Clone sample project
+
+          ```bash
+          git clone https://github.com/dotcs/typescript-autoformat-demo.git
+          cd typescript-autoformat-demo
+
+          yarn install
+          ```
+        </script>
+      </section>
+
+      <section>
+        <section data-markdown data-noescape>
+          <script type="text/template">
+            ## How to avoid common pitfalls?
+
+            * Forget JavaScript. Use TypeScript! [(strict mode)](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-6.html#strict-function-types)
+            * Use a linter
+            * Be persistent - don't change the rules
+          </script>
+        </section>
+        <section data-markdown data-noescape>
+          <script type="text/template">
+            ### Install & configure tslint
+
+            ```bash
+            $ yarn add --dev tslint
+            $ ./node_modules/.bin/tslint --init
+            ```
+
+            ```js
+            // package.json
+            {
+              scripts: {
+                "lint": "tslint --type-check -p tsconfig.json -c tslint.json"
+              }
+            }
+            ```
+          </script>
+        </section>
+
+        <section data-markdown data-noescape>
+          <script type="text/template">
+            ## OMG, so many things to do ... 😱
+            ```text
+            $ yarn lint
+            yarn run v1.3.2
+            $ tslint --type-check -p tsconfig.json -c tslint.json
+            --type-check is deprecated. You only need --project to enable rules which need type information.
+
+            ERROR: /Users/fmueller/src/index.tsx[5, 11]: interface name must start with a capitalized I
+            ERROR: /Users/fmueller/src/index.tsx[9, 3]: The class property 'timer' must be marked either 'private', 'public', or 'protected'
+            ERROR: /Users/fmueller/src/index.tsx[11, 3]: The class property 'state' must be marked either 'private', 'public', or 'protected'
+            ERROR: /Users/fmueller/src/index.tsx[11, 41]: Missing trailing comma
+            ERROR: /Users/fmueller/src/index.tsx[14, 3]: The class method 'componentDidMount' must be marked either 'private', 'public', or 'protected'
+            ERROR: /Users/fmueller/src/index.tsx[18, 3]: The class method 'componentWillUnmount' must be marked either 'private', 'public', or 'protected'
+            ERROR: /Users/fmueller/src/index.tsx[19, 5]: if statements must be braced
+            ERROR: /Users/fmueller/src/index.tsx[23, 3]: The class property 'updateTime' must be marked either 'private', 'public', or 'protected'
+            ERROR: /Users/fmueller/src/index.tsx[25, 4]: Unnecessary semicolon
+            ERROR: /Users/fmueller/src/index.tsx[27, 3]: The class method 'render' must be marked either 'private', 'public', or 'protected'
+            ERROR: /Users/fmueller/src/index.tsx[36, 13]: trailing whitespace
+            ERROR: /Users/fmueller/src/index.tsx[37, 34]: Missing trailing comma
+            ```
+          </script>
+        </section>
+
+
+      </section>
+
+      <section>
+        <section data-markdown data-noescape>
+          <script type="text/template">
+            ## Need moar tooling
+
+            Excerpt from my new book:  
+            **1337 reasons why I as a programmer don't follow the rules**
+
+            * I don't care about code formatting AT ALL<!--.element class="fragment"-->
+            * I got errors for a code style thing? ... let me disable that 4U!<!--.element class="fragment"-->
+            * What the heck?... Just leave me alone<!--.element class="fragment"-->
+            * New project, new rules? C'mon!<!--.element class="fragment"-->
+            * I hate to follow the GWMW principle<!--.element class="fragment"--> *(Get-what-the-maintainer-wants)*
+            * ...<!--.element class="fragment"-->
+          </script>
+        </section>
+        <section data-markdown data-noescape>
+          <script type="text/template">
+            ```bash
+            $ yarn add --dev prettier husky lint-staged
+            ```
+
+            ```javascript
+            // package.json
+            {
+              "scripts": {
+                "precommit": "lint-staged",
+                "prettier:base": "prettier --parser typescript --single-quote --trailing-comma none",
+                "prettier:list": "yarn prettier:base --list-different \"src/**/*.{ts,tsx}\"",
+                "prettier:write": "yarn prettier:base --write \"src/**/*.{ts,tsx}\""
+              }
+            }
+            ```
+
+            ```javascript
+            // .lintstagedrc
+            {
+              "src/**/*.{ts,tsx}": [
+                "yarn prettier:base --write",
+                "yarn lint --fix",
+                "git add"
+              ]
+            }
+            ```
+          </script>
+        </section>
+      </section>
+
+      <section>
+        <section data-markdown data-noescape>
+          <script type="text/template">
+            ## Even moar automation
+
+            * IDE on steroids
+            * TWYW (Type-what-you-want)
+            * HFA (Happyness for all) 🦄
+          </script>
+        </section>
+        <section data-markdown data-noescape>
+          <script type="text/template">
+            ```javascript
+            // VSCode settings
+            {
+              "editor.formatOnSave": true,
+              "prettier.singleQuote": true,
+              "prettier.trailingComma": "none"
+            }
+            ```
+            <small>[Link to VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)</small>
+          </script>
+        </section>
+
+      </section>
+
+
+    </div>
+
+  </div>
+
+  <script src="lib/js/head.min.js"></script>
+  <script src="js/reveal.js"></script>
+
+  <script>
+    // More info https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+      history: true,
+
+      // More info https://github.com/hakimel/reveal.js#dependencies
+      dependencies: [
+        { src: 'plugin/markdown/marked.js' },
+        { src: 'plugin/markdown/markdown.js' },
+        { src: 'plugin/notes/notes.js', async: true },
+        { src: 'plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); } }
+      ]
+    });
+  </script>
+</body>
+
+</html>

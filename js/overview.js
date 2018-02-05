@@ -15531,29 +15531,15 @@ var _user$project$Main$model = {
 	mdl: _debois$elm_mdl$Material$model,
 	brownbags: _elm_lang$core$Native_List.fromArray(
 		[
-			{
-			title: 'RxJS',
-			presentedAt: _elm_lang$core$Maybe$Just(
-				A2(
-					_elm_lang$core$Result$withDefault,
-					_elm_lang$core$Date$fromTime(0),
-					_elm_lang$core$Date$fromString('2016/10/05'))),
-			lastUpdated: _elm_lang$core$Maybe$Just(
-				A2(
-					_elm_lang$core$Result$withDefault,
-					_elm_lang$core$Date$fromTime(0),
-					_elm_lang$core$Date$fromString('2016/10/04'))),
-			available: true,
-			description: '\nTalk for beginners that introduces [RxJS (Reactive Extensions for Javascript)](http://reactivex.io/rxjs/) developed by Microsoft.\n\nThis presentation covers:\n* Introduction to functional and reactive programming\n* Observables API discussion\n* Marble diagrams\n* Comparison of cold and hot Observables\n* Combining Observables with operators\n* Error handling\n* Observables in Angular 2\n* Outlook: Standardization process of Observables\n\nAll examples given in this talk are written in RxJS 5.\n'
-		},
-			{title: 'Elm', available: false, lastUpdated: _elm_lang$core$Maybe$Nothing, description: '\nIntroduction to Elm.\n', presentedAt: _elm_lang$core$Maybe$Nothing}
+			{title: 'RxJS', filename: 'index-rxjs.html', available: true, description: '\nTalk for beginners that introduces [RxJS (Reactive Extensions for Javascript)](http://reactivex.io/rxjs/) developed by Microsoft.\n\nThis presentation covers:\n* Introduction to functional and reactive programming\n* Observables API discussion\n* Marble diagrams\n* Comparison of cold and hot Observables\n* Combining Observables with operators\n* Error handling\n* Observables in Angular 2\n* Outlook: Standardization process of Observables\n\nAll examples given in this talk are written in RxJS 5.\n'},
+			{title: 'TypeScript - Automated codestyle', available: true, description: '\nTalk that shows how to easily setup an TypeScript enviroment with automated linting and code-style conventions.\n', filename: 'index-typescript-automated-codestyle.html'}
 		]),
 	query: '',
 	searchOpen: false
 };
-var _user$project$Main$Brownbag = F5(
-	function (a, b, c, d, e) {
-		return {title: a, description: b, presentedAt: c, lastUpdated: d, available: e};
+var _user$project$Main$Brownbag = F4(
+	function (a, b, c, d) {
+		return {title: a, description: b, available: c, filename: d};
 	});
 var _user$project$Main$Model = F4(
 	function (a, b, c, d) {
@@ -15563,9 +15549,9 @@ var _user$project$Main$Page = F6(
 	function (a, b, c, d, e, f) {
 		return {title: a, content: b, githubUser: c, query: d, searchOpen: e, countResults: f};
 	});
-var _user$project$Main$Card = F7(
-	function (a, b, c, d, e, f, g) {
-		return {title: a, description: b, btnText: c, btnHref: d, accessable: e, checkedAt: f, lastUpdated: g};
+var _user$project$Main$Card = F5(
+	function (a, b, c, d, e) {
+		return {title: a, description: b, btnText: c, btnHref: d, accessable: e};
 	});
 var _user$project$Main$ResetSearch = {ctor: 'ResetSearch'};
 var _user$project$Main$MaybeResetSearch = {ctor: 'MaybeResetSearch'};
@@ -15788,75 +15774,7 @@ var _user$project$Main$cardView = function (card) {
 					_elm_lang$html$Html$text(card.btnText)
 				]))
 		]);
-	var menuItems = card.accessable ? _elm_lang$core$Native_List.fromArray(
-		[
-			A5(
-			_debois$elm_mdl$Material_Button$render,
-			_user$project$Main$Mdl,
-			_elm_lang$core$Native_List.fromArray(
-				[0]),
-			_user$project$Main$model.mdl,
-			_elm_lang$core$Native_List.fromArray(
-				[_debois$elm_mdl$Material_Button$icon]),
-			_elm_lang$core$Native_List.fromArray(
-				[
-					A2(
-					_elm_lang$html$Html$i,
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html_Attributes$class('material-icons'),
-							_elm_lang$html$Html_Attributes$title(
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								'last changed ',
-								A3(
-									_rluiten$elm_date_extra$Date_Extra_Format$format,
-									_rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config,
-									_rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config.format.date,
-									A2(
-										_elm_lang$core$Maybe$withDefault,
-										_elm_lang$core$Date$fromTime(0),
-										card.lastUpdated))))
-						]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html$text('track_changes')
-						]))
-				])),
-			A5(
-			_debois$elm_mdl$Material_Button$render,
-			_user$project$Main$Mdl,
-			_elm_lang$core$Native_List.fromArray(
-				[1]),
-			_user$project$Main$model.mdl,
-			_elm_lang$core$Native_List.fromArray(
-				[_debois$elm_mdl$Material_Button$icon]),
-			_elm_lang$core$Native_List.fromArray(
-				[
-					A2(
-					_elm_lang$html$Html$i,
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html_Attributes$class('material-icons'),
-							_elm_lang$html$Html_Attributes$title(
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								'presented at ',
-								A3(
-									_rluiten$elm_date_extra$Date_Extra_Format$format,
-									_rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config,
-									_rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config.format.date,
-									A2(
-										_elm_lang$core$Maybe$withDefault,
-										_elm_lang$core$Date$fromTime(0),
-										card.checkedAt))))
-						]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html$text('check')
-						]))
-				]))
-		]) : _elm_lang$core$Native_List.fromArray(
+	var menuItems = _elm_lang$core$Native_List.fromArray(
 		[]);
 	return A2(
 		_debois$elm_mdl$Material_Card$view,
@@ -15907,16 +15825,8 @@ var _user$project$Main$brownbagCardView = function (brownbag) {
 					[]),
 				brownbag.description),
 			btnText: 'Show presentation',
-			btnHref: A2(
-				_elm_lang$core$Basics_ops['++'],
-				'index-',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$String$toLower(brownbag.title),
-					'.html')),
-			accessable: brownbag.available,
-			checkedAt: brownbag.presentedAt,
-			lastUpdated: brownbag.lastUpdated
+			btnHref: brownbag.filename,
+			accessable: brownbag.available
 		});
 };
 var _user$project$Main$view = function (model) {

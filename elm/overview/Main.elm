@@ -35,9 +35,8 @@ type alias Mdl =
 type alias Brownbag =
     { title : String
     , description : String
-    , presentedAt : Maybe Date.Date
-    , lastUpdated : Maybe Date.Date
     , available : Bool
+    , filename : String
     }
 
 
@@ -58,8 +57,7 @@ model =
     { mdl = Material.model
     , brownbags =
         [ { title = "RxJS"
-          , presentedAt = Just (Date.fromString "2016/10/05" |> Result.withDefault (Date.fromTime 0))
-          , lastUpdated = Just (Date.fromString "2016/10/04" |> Result.withDefault (Date.fromTime 0))
+          , filename = "index-rxjs.html"
           , available = True
           , description = """
 Talk for beginners that introduces [RxJS (Reactive Extensions for Javascript)](http://reactivex.io/rxjs/) developed by Microsoft.
@@ -77,13 +75,12 @@ This presentation covers:
 All examples given in this talk are written in RxJS 5.
 """
           }
-        , { title = "Elm"
-          , available = False
-          , lastUpdated = Nothing
+        , { title = "TypeScript - Automated codestyle"
+          , available = True
           , description = """
-Introduction to Elm.
+Talk that shows how to easily setup an TypeScript enviroment with automated linting and code-style conventions.
 """
-          , presentedAt = Nothing
+          , filename = "index-typescript-automated-codestyle.html"
           }
         ]
     , query = ""
@@ -177,8 +174,6 @@ type alias Card =
     , btnText : String
     , btnHref : String
     , accessable : Bool
-    , checkedAt : Maybe Date.Date
-    , lastUpdated : Maybe Date.Date
     }
 
 
@@ -292,41 +287,15 @@ brownbagCardView brownbag =
         { title = brownbag.title
         , description = Markdown.toHtml [] brownbag.description
         , btnText = "Show presentation"
-        , btnHref = ("index-" ++ String.toLower brownbag.title ++ ".html")
+        , btnHref = brownbag.filename
         , accessable = brownbag.available
-        , checkedAt = brownbag.presentedAt
-        , lastUpdated = brownbag.lastUpdated
         }
 
 
 cardView : Card -> Html Msg
 cardView card =
     let
-        menuItems =
-            if card.accessable then
-                [ Button.render Mdl
-                    [ 0 ]
-                    model.mdl
-                    [ Button.icon ]
-                    [ i
-                        [ class "material-icons"
-                        , title ("last changed " ++ (format config config.format.date (Maybe.withDefault (Date.fromTime 0) card.lastUpdated)))
-                        ]
-                        [ text "track_changes" ]
-                    ]
-                , Button.render Mdl
-                    [ 1 ]
-                    model.mdl
-                    [ Button.icon ]
-                    [ i
-                        [ class "material-icons"
-                        , title ("presented at " ++ (format config config.format.date (Maybe.withDefault (Date.fromTime 0) card.checkedAt)))
-                        ]
-                        [ text "check" ]
-                    ]
-                ]
-            else
-                []
+        menuItems = []
 
         actionItems =
             [ if card.accessable then
