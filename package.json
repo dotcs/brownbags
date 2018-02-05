@@ -5,7 +5,8 @@
   "scripts": {
     "test": "grunt test",
     "start": "grunt serve",
-    "elm-watch": "chokidar 'elm/overview/*.elm' -c 'elm make elm/overview/Main.elm --output js/overview.js' --initial"
+    "elm-watch":
+      "chokidar 'elm/overview/*.elm' -c 'elm make elm/overview/Main.elm --output js/overview.js' --initial"
   },
   "author": {
     "name": "Fabian Mueller",
@@ -14,9 +15,6 @@
   "repository": {
     "type": "git",
     "url": "git@github.com:dotcs/brownbags.git"
-  },
-  "engines": {
-    "node": "~4.1.1"
   },
   "dependencies": {
     "express": "~4.13.3",
